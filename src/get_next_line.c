@@ -6,7 +6,7 @@
 /*   By: rkerman <rkerman@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 16:46:22 by rkerman           #+#    #+#             */
-/*   Updated: 2025/01/01 19:51:40 by rkerman          ###   ########.fr       */
+/*   Updated: 2025/01/01 22:35:58 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ size_t ft_strlen(char *s)
 	size_t i;
 
 	i = 0;
-	while (s[i])
+	while (s && s[i])
 		i++;
 	return (i);
 }
@@ -63,12 +63,12 @@ void *ft_realloc(void *ptr, size_t size)
 {
 	size_t			old_size;
 	unsigned char	*nptr;
-	unsigned char	*cptr;
+	//unsigned char	*cptr;
 
 	if (!ptr)
 		return (ft_calloc(size, 1));
 	old_size = ft_strlen(ptr);
-	cptr = (unsigned char *)ptr;
+	//cptr = (unsigned char *)ptr;
 	if (old_size >= size)
 		return (ptr);
 	nptr = ft_calloc(size, 1);
@@ -100,10 +100,12 @@ char *get_line(char *w)
 	int		i;
 
 	i = 0;
+	if (!ft_strlen(w))
+		return (NULL);
 	if (ft_strchr(w, '\n') > -1)
 		p = ft_strchr(w, '\n') + 1;
 	else
-		p = ft_strchr(w, '\0');
+		p = ft_strlen(w);
 	l = ft_calloc(p + 1, sizeof(char));
 	if (!l)
 		return (NULL);
@@ -174,7 +176,7 @@ char *get_next_line(int fd)
 		free(stash);
 	return (line);
 }
-
+/*
 #include <fcntl.h>
 
 int main(void)
@@ -182,7 +184,7 @@ int main(void)
 	int	fd;
 	char *s;
 
-	fd = open("test.txt", O_RDONLY);
+	fd = open("41_no_nl", O_RDONLY);
 	s = get_next_line(fd);
 	printf("%s", s);
 	free(s);
@@ -201,4 +203,4 @@ int main(void)
 
 
 	close(fd);	
-}
+}*/
