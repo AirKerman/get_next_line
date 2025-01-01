@@ -6,7 +6,7 @@
 /*   By: rkerman <rkerman@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 16:46:22 by rkerman           #+#    #+#             */
-/*   Updated: 2025/01/01 17:39:39 by rkerman          ###   ########.fr       */
+/*   Updated: 2025/01/01 19:51:40 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ char *get_line(char *w)
 
 	i = 0;
 	if (ft_strchr(w, '\n') > -1)
-		p = ft_strchr(w, '\n');
+		p = ft_strchr(w, '\n') + 1;
 	else
 		p = ft_strchr(w, '\0');
 	l = ft_calloc(p + 1, sizeof(char));
@@ -113,6 +113,34 @@ char *get_line(char *w)
 		i++;
 	}
 	return (l);
+}
+
+char *new_stash(char *s)
+{
+	int		p;
+	char	*stash;
+	int		i;
+	
+	i = 0;
+	if (ft_strchr(s, '\n') > -1)
+		p =  ft_strchr(s, '\n') + 1 ;
+	else
+		p = ft_strchr(s, '\0');
+	if (p == -1)
+	{
+		free(s);
+		return (NULL);
+	}
+	stash = ft_calloc((ft_strlen(s) + 1) - p, sizeof(char));
+	if (!stash)
+		return (NULL);
+	while (s[p + i])
+	{
+		stash[i] = s[p + i];
+		i++;
+	}
+	free(s);
+	return (stash);
 }
 
 char *get_next_line(int fd)
@@ -141,7 +169,8 @@ char *get_next_line(int fd)
 		read_bytes = read(fd, &stash[size_stash], BUFFER_SIZE);
 	}
 	line = get_line(stash);
-	if (!read_bytes || line == NULL)
+	stash = new_stash(stash);
+	if (!read_bytes || line == NULL || stash == NULL)
 		free(stash);
 	return (line);
 }
@@ -160,6 +189,16 @@ int main(void)
 	s = get_next_line(fd);
 	printf("%s", s);
 	free(s);
+	s = get_next_line(fd);
+	printf("%s", s);
+	free(s);
+	s = get_next_line(fd);
+	printf("%s", s);
+	free(s);
+	s = get_next_line(fd);
+	printf("%s", s);
+	free(s);
+
 
 	close(fd);	
 }
