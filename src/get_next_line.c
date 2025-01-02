@@ -6,7 +6,7 @@
 /*   By: rkerman <rkerman@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 16:46:22 by rkerman           #+#    #+#             */
-/*   Updated: 2025/01/01 22:35:58 by rkerman          ###   ########.fr       */
+/*   Updated: 2025/01/02 19:53:00 by rkerman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,12 +63,10 @@ void *ft_realloc(void *ptr, size_t size)
 {
 	size_t			old_size;
 	unsigned char	*nptr;
-	//unsigned char	*cptr;
 
 	if (!ptr)
 		return (ft_calloc(size, 1));
 	old_size = ft_strlen(ptr);
-	//cptr = (unsigned char *)ptr;
 	if (old_size >= size)
 		return (ptr);
 	nptr = ft_calloc(size, 1);
@@ -93,7 +91,7 @@ int ft_strchr(char *s, char c)
 	return (-1);
 }
 
-char *get_line(char *w)
+char *get_lines(char *w)
 {
 	char	*l;
 	int		p;
@@ -147,7 +145,7 @@ char *new_stash(char *s)
 
 char *get_next_line(int fd)
 {
-	static char *stash;
+	static char *stash[4096];
 	int			read_bytes;
 	size_t		size_stash;
 	char		*line;
@@ -155,25 +153,25 @@ char *get_next_line(int fd)
 	read_bytes = 1;
 	if (fd == -1 || read(fd, NULL, 0) == -1 || BUFFER_SIZE < 1)
 		return (NULL);
-	if (!stash)
-		stash = ft_realloc(stash, BUFFER_SIZE + 1);
-	if (!stash)
+	if (!stash[fd])
+		stash[fd] = ft_realloc(stash[fd], BUFFER_SIZE + 1);
+	if (!stash[fd])
 		return (NULL);
-	while(read_bytes && ft_strchr(stash, '\n') == -1)
+	while(read_bytes && ft_strchr(stash[fd], '\n') == -1)
 	{
-		size_stash = ft_strlen(stash);
-		stash = ft_realloc(stash, size_stash + BUFFER_SIZE + 1);
-		if (!stash)
+		size_stash = ft_strlen(stash[fd]);
+		stash[fd] = ft_realloc(stash[fd], size_stash + BUFFER_SIZE + 1);
+		if (!stash[fd])
 		{
-			free(stash);
+			free(stash[fd]);
 			return (NULL);
 		}
-		read_bytes = read(fd, &stash[size_stash], BUFFER_SIZE);
+		read_bytes = read(fd, &stash[fd][size_stash], BUFFER_SIZE);
 	}
-	line = get_line(stash);
-	stash = new_stash(stash);
-	if (!read_bytes || line == NULL || stash == NULL)
-		free(stash);
+	line = get_lines(stash[fd]);
+	stash[fd] = new_stash(stash[fd]);
+	if (!read_bytes || line == NULL)
+		free(stash[fd]);
 	return (line);
 }
 /*
@@ -184,7 +182,15 @@ int main(void)
 	int	fd;
 	char *s;
 
-	fd = open("41_no_nl", O_RDONLY);
+	fd = open("read_error.txt", O_RDONLY);
+	s = get_next_line(fd);
+	printf("%s", s);
+	free(s);
+	s = get_next_line(fd);
+	printf("%s", s);
+	free(s);
+	close(fd);
+	fd = open("read_error.txt", O_RDONLY);
 	s = get_next_line(fd);
 	printf("%s", s);
 	free(s);
@@ -194,13 +200,5 @@ int main(void)
 	s = get_next_line(fd);
 	printf("%s", s);
 	free(s);
-	s = get_next_line(fd);
-	printf("%s", s);
-	free(s);
-	s = get_next_line(fd);
-	printf("%s", s);
-	free(s);
-
-
 	close(fd);	
 }*/
